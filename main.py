@@ -36,16 +36,15 @@ def show_webcam(mirror=False):
     history_length = 16
     point_history = deque(maxlen=history_length)
 
-    # フィンガージェスチャー履歴 ################################################
     finger_gesture_history = deque(maxlen=history_length)
 
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(1)
     while True:
         ret_val, img = cam.read()
         if mirror:
             img = cv2.flip(img, 1)
 
-        x, y, _ = img.shape
+        # x, y, _ = img.shape
 
         img.flags.writeable = False
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -58,16 +57,22 @@ def show_webcam(mirror=False):
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
 
-                landmark_list = utils.calc_landmark_list(img, hand_landmarks)
+                landmark_list = utils.calc_landmark_list(
+                    img, hand_landmarks)
 
-                # 相対座標・正規化座標への変換
+                # POSE RECOGNITION
                 pre_processed_landmark_list = utils.pre_process_landmark(
                     landmark_list)
 
                 tmp = pose_model.predict([pre_processed_landmark_list])
                 result = np.amax(np.squeeze(tmp))
-                pose_class_name = poses_class_names[np.argmax(np.squeeze(tmp))]
+                pose_class_name = poses_class_names[np.argmax(
+                    np.squeeze(tmp))]
 
+                if result < 0.7:
+                    pose_class_name = "Other"
+
+                # GESTURE RECOGNITION
                 pre_processed_point_history_list = utils.pre_process_point_history(
                     img, point_history
                 )
@@ -102,9 +107,6 @@ def show_webcam(mirror=False):
                     mp_drawing_styles.get_default_hand_landmarks_style(),
                     mp_drawing_styles.get_default_hand_connections_style(),
                 )
-
-                if result < 0.7:
-                    pose_class_name = "Other"
 
                 # show the prediction on the frame
                 cv2.putText(
