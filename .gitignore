@@ -1,7 +1,2 @@
 .DS_Store
-datasets/*
 __pycache__/*
-hand_landmarks.csv
-model.joblib
-image_to_data.py
-training_hand_gesture.py
