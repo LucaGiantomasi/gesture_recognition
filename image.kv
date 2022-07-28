@@ -1,13 +1,22 @@
 #:kivy 1.0.9
 
 <MovingCircle>:
-    size: 50, 50 
     canvas:
         Color:
             rgb: 255,0,0
         Ellipse:
-            pos: self.pos
-            size: self.size
+            pos: root.pos
+            size: 50, 50
+
+<WindowManager>:
+    main_window: main_window
+    second_window: second_window
+
+    MainWindow:
+        id: main_window
+
+    SecondWindow:
+        id: second_window
 
 <ImageWidget>:
     Image:
@@ -16,13 +25,22 @@
         keep_ratio: True
         size: root.width, root.height
 
-<ImageApp>:
+<MainWindow>:
+    name: "main"
     user_hand: moving_circle
 
     ImageWidget:
-        source: root.source
         size: root.width, root.height
 
     MovingCircle:
         id: moving_circle
-        center: self.parent.center
+        center: root.center
+
+<SecondWindow>:
+    name: "second"
+
+    Button:
+        text: "Go Back"
+        on_release:
+            app.root.current = "main"
+            root.manager.transition.direction = "right"
