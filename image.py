@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scatter import Scatter
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
 import cv2
@@ -41,6 +41,10 @@ class MovingCircle(Widget):
     pass
 
 
+class Rectangle(Widget):
+    pass
+
+
 class ImageWidget(Scatter):
 
     def __init__(self, **kwargs):
@@ -51,16 +55,7 @@ class ImageWidget(Scatter):
         with open('config/image_configs.json') as f:
             data = json.load(f)
             self.source = "images/" + data['source']
-
-    # def on_touch_down(self, touch):
-    #     # # Override Scatter's `on_touch_down` behavior for mouse scroll
-    #     if touch.button == 'left':
-    #         factor = 1.1
-    #     elif touch.button == 'right':
-    #         factor = 1 / 1.1
-    #     if factor is not None:
-    #         self.apply_transform(Matrix().scale(factor, factor, factor),
-    #                              anchor=touch.pos)
+            self.add_widget(Rectangle())
 
 
 class MainWindow(Screen):
@@ -129,16 +124,21 @@ class MainWindow(Screen):
                     app = App.get_running_app()
                     app.root.current = "second"
                     app.root.transition.direction = "left"
+                    # Set image and text of second window
+                    with open('config/image_configs.json') as f:
+                        # TODO get correct detail from current position
+                        detail = json.load(f)["details"][0]
+                        app.root.second_window.source = "images/" + \
+                            detail["source"]
+                        app.root.second_window.text = detail["text"]
+                    # Clear all queues
                     point_history.clear()
                     finger_gesture_history.clear()
 
 
 class SecondWindow(Screen):
-
-    def __init__(self, **kwargs):
-        super(SecondWindow, self).__init__(**kwargs)
-        # TODO dynamically set image source based on hand position
-        self.source = "images/wallpaper.jpg"
+    source = StringProperty(None)
+    text = StringProperty("")
 
     def update(self):
         _, img = cam.read()

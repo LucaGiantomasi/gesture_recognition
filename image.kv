@@ -8,6 +8,14 @@
             pos: root.pos
             size: 50, 50
 
+<Rectangle>:
+    canvas:
+        Color:
+            rgba: 255, 255, 0, 1
+        Line:
+            width: 2.
+            rectangle: (self.x, self.y, self.width, self.height)
+
 <WindowManager>:
     main_window: main_window
     second_window: second_window
@@ -54,4 +62,4 @@
             text_size: self.width, None
             size: self.texture_size
             font_size: 40
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a dui odio. Curabitur ac eros et augue blandit iaculis vel ut ante. Aliquam non elementum purus, eu pretium nunc. Phasellus eros leo, pretium eu pharetra id, porta eget orci. Morbi non congue tellus, ac viverra lacus. Sed eget magna id nunc commodo mattis at at ipsum. Cras metus ex, fermentum eget varius sit amet, porttitor vitae mauris. Proin nec metus tempus, fermentum justo a, tincidunt lacus. Sed vulputate ut mi sit amet vestibulum. Nam consequat finibus nulla, eget interdum erat ultricies ac. Sed lobortis sed eros ac vulputate. Vestibulum at placerat quam. Vestibulum non neque laoreet, interdum leo sit amet, fringilla lorem. Pellentesque sit amet efficitur nulla. Proin in dictum justo. Quisque pellentesque lectus id ullamcorper mattis. Fusce ullamcorper felis ac lorem interdum cursus. Maecenas bibendum justo eu libero dictum, id viverra eros posuere. Ut at ultricies mi. Cras facilisis leo et dignissim pharetra. Duis vel sem fermentum, eleifend leo a, tristique mauris. Nunc sed suscipit mauris. Maecenas consectetur, sem ac consectetur tincidunt, magna leo accumsan sapien, a scelerisque arcu risus eu dui. Quisque scelerisque commodo lacus luctus vehicula. Aenean non lectus vehicula, pellentesque velit eget, vestibulum lorem. Etiam magna libero, semper id efficitur at, egestas interdum velit. Cras facilisis, magna a pharetra finibus, nisi justo pretium urna, rutrum dictum quam velit nec lorem. Cras eget semper elit. Vivamus commodo, elit non sodales laoreet, diam mauris hendrerit eros, in vehicula nisi mi a urna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin est turpis, pharetra vel tellus vel, maximus lobortis metus. In hac habitasse platea dictumst. Nunc fringilla sem eu nulla malesuada, sit amet placerat purus imperdiet. In rutrum imperdiet libero consequat sodales. In euismod magna vestibulum odio sollicitudin fringilla eget sit amet est. Vivamus massa arcu, rhoncus quis gravida in, egestas eu nibh. Ut metus arcu, rutrum vitae pharetra vitae, ornare at dolor. Nunc cursus arcu sed lobortis malesuada. Praesent odio turpis, elementum quis nibh quis, auctor dictum nulla. Nam ut mi a justo placerat tincidunt at quis justo. Aenean lacinia enim mi, id dapibus quam vehicula eu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer lacinia risus eu dictum feugiat. Phasellus ac dui finibus, porttitor enim ut, finibus turpis. Aliquam placerat felis orci, ac feugiat lectus vulputate sit amet. Proin aliquet velit diam, sed consectetur dui vulputate vel. Donec vitae pulvinar tellus, ullamcorper vestibulum nisi. Curabitur scelerisque venenatis mauris, nec pretium erat finibus non. Morbi ut felis non orci vestibulum aliquam. Vivamus et magna venenatis, malesuada ante pulvinar, varius purus. Proin vitae vestibulum lectus. Sed sapien urna, fermentum dictum rutrum eget, ultricies vitae lorem. Mauris purus nulla, imperdiet sit amet felis quis, efficitur mattis sem. Sed ac bibendum nisl, ac blandit dui. Cras venenatis nec dui a sollicitudin. Quisque posuere lorem risus, et fringilla dolor ultrices posuere. Quisque luctus aliquam enim id convallis. Etiam sagittis arcu sed nisl ornare rutrum. Suspendisse dolor nulla, elementum sed dui sed, viverra posuere urna. Fusce magna mauris, feugiat sed ligula ac, placerat consectetur sapien. Mauris sed urna quis odio porttitor pellentesque. Aliquam auctor dictum quam vel suscipit."
+            text: root.text
