@@ -1,4 +1,3 @@
-from tracemalloc import start
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -42,7 +41,8 @@ class MovingCircle(Widget):
 
 
 class DetailRectangle(Widget):
-    pass
+    source = StringProperty(None)
+    text = StringProperty(None)
 
 
 class ImageWidget(Scatter):
@@ -64,7 +64,7 @@ class MainWindow(Screen):
             data = json.load(f)
             for detail in data["details"]:
                 self.add_widget(
-                    DetailRectangle(size_hint=detail['dimension'], pos_hint={'x': detail['start_position'][0], 'y': detail['start_position'][1]}))
+                    DetailRectangle(size_hint=detail['dimension'], pos_hint={'x': detail['start_position'][0], 'y': detail['start_position'][1]}, source=detail['source'], text=detail['text']))
             # Add image always in background
             self.add_widget(ImageWidget(
                 size=self.size, source="images/" + data['source']), 99)
@@ -129,20 +129,19 @@ class MainWindow(Screen):
                     finger_gesture_history).most_common()
                 gesture_class_name = gesture_class_names[most_common_fg_id[0][0]]
                 if gesture_class_name == "Pinch":
-                    # TODO Check if it is on a detail
-                    app = App.get_running_app()
-                    app.root.current = "second"
-                    app.root.transition.direction = "left"
-                    # Set image and text of second window
-                    with open('config/image_configs.json') as f:
-                        # TODO get correct detail from current position
-                        detail = json.load(f)["details"][0]
-                        app.root.second_window.source = "images/" + \
-                            detail["source"]
-                        app.root.second_window.text = detail["text"]
-                    # Clear all queues
-                    point_history.clear()
-                    finger_gesture_history.clear()
+                    # Check if it is on a detail
+                    for child in self.children:
+                        if isinstance(child, DetailRectangle):
+                            if self.user_hand.collide_widget(child):
+                                app = App.get_running_app()
+                                app.root.current = "second"
+                                app.root.transition.direction = "left"
+                                # Set image and text of second window
+                                app.root.second_window.source = "images/" + child.source
+                                app.root.second_window.text = child.text
+                                # Clear all queues
+                                point_history.clear()
+                                finger_gesture_history.clear()
 
 
 class SecondWindow(Screen):
