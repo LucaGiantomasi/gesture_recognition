@@ -1,9 +1,9 @@
+from tracemalloc import start
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scatter import Scatter
 from kivy.properties import ObjectProperty, StringProperty
-from kivy.uix.widget import Widget
 from kivy.clock import Clock
 import cv2
 import mediapipe as mp
@@ -41,25 +41,33 @@ class MovingCircle(Widget):
     pass
 
 
-class Rectangle(Widget):
+class DetailRectangle(Widget):
     pass
 
 
 class ImageWidget(Scatter):
+    source = StringProperty(None)
 
     def __init__(self, **kwargs):
         super(ImageWidget, self).__init__(**kwargs)
         self.do_rotation = False
         self.do_scale = False
         self.do_translation = False
-        with open('config/image_configs.json') as f:
-            data = json.load(f)
-            self.source = "images/" + data['source']
-            self.add_widget(Rectangle())
 
 
 class MainWindow(Screen):
     user_hand = ObjectProperty(None)
+
+    def __init__(self, **kwargs):
+        super(MainWindow, self).__init__(**kwargs)
+        with open('config/image_configs.json') as f:
+            data = json.load(f)
+            for detail in data["details"]:
+                self.add_widget(
+                    DetailRectangle(size_hint=detail['dimension'], pos_hint={'x': detail['start_position'][0], 'y': detail['start_position'][1]}))
+            # Add image always in background
+            self.add_widget(ImageWidget(
+                size=self.size, source="images/" + data['source']), 99)
 
     def update(self):
         # Get movement of user hand and move circle accordingly
@@ -121,6 +129,7 @@ class MainWindow(Screen):
                     finger_gesture_history).most_common()
                 gesture_class_name = gesture_class_names[most_common_fg_id[0][0]]
                 if gesture_class_name == "Pinch":
+                    # TODO Check if it is on a detail
                     app = App.get_running_app()
                     app.root.current = "second"
                     app.root.transition.direction = "left"
