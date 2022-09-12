@@ -13,10 +13,10 @@ from collections import deque
 import utils
 import numpy as np
 
-cam = cv2.VideoCapture(1)
+cam = cv2.VideoCapture(0)
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
-    static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5
+    static_image_mode="store_true", max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.7
 )
 pose_model = tf.keras.models.load_model("keypoint_classifier.hdf5")
 gesture_model = tf.keras.models.load_model("point_history_classifier.hdf5")
@@ -59,6 +59,8 @@ class MainWindow(Screen):
     user_hand = ObjectProperty(None)
     index = NumericProperty(0)
     length = NumericProperty(0)
+    start_pos_x = NumericProperty(0)
+    stop_frame = NumericProperty(0)
 
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
@@ -66,80 +68,103 @@ class MainWindow(Screen):
 
     def update(self):
         # Get movement of user hand and move circle accordingly
-        _, img = cam.read()
-        if img is not None:
-            img = cv2.flip(img, -1)
-            img.flags.writeable = False
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        ret, img = cam.read()
+        if not ret:
+            return
+        img = cv2.flip(img, 1)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-            results = hands.process(img)
+        img.flags.writeable = False
+        results = hands.process(img)
+        img.flags.writeable = True
 
-            img.flags.writeable = True
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            if results.multi_hand_landmarks:
-                for hand_landmarks in results.multi_hand_landmarks:
-                    center = [hand_landmarks.landmark[9].x * self.width * 1.7,
-                              hand_landmarks.landmark[9].y * self.height * 1.7]
-                    self.user_hand.center = center
+        if self.stop_frame < 8:
+            self.stop_frame += 1
 
-                    landmark_list = utils.calc_landmark_list(
-                        img, hand_landmarks)
+        if results.multi_hand_landmarks is not None:
+            for hand_landmarks in results.multi_hand_landmarks:
+                center = [hand_landmarks.landmark[9].x * self.width * 1.4,
+                          (1 - hand_landmarks.landmark[9].y) * self.height * 1.4]
+                self.user_hand.center = center
 
-                    # POSE RECOGNITION
-                    pre_processed_landmark_list = utils.pre_process_landmark(
-                        landmark_list)
+                landmark_list = utils.calc_landmark_list(
+                    img, hand_landmarks)
 
-                    tmp = pose_model.predict([pre_processed_landmark_list])
-                    result = np.amax(np.squeeze(tmp))
-                    pose_class_name = poses_class_names[np.argmax(
-                        np.squeeze(tmp))]
+                # POSE RECOGNITION
+                pre_processed_landmark_list = utils.pre_process_landmark(
+                    landmark_list)
 
-                    if result < 0.7:
-                        pose_class_name = "Other"
+                tmp = pose_model.predict([pre_processed_landmark_list])
+                result = np.amax(np.squeeze(tmp))
+                pose_class_name = poses_class_names[np.argmax(
+                    np.squeeze(tmp))]
 
-                    # GESTURE RECOGNITION
-                    pre_processed_point_history_list = utils.pre_process_point_history(
-                        img, point_history
-                    )
+                if result < 0.7:
+                    pose_class_name = "Other"
 
-                    if pose_class_name == "Point":
-                        point_history.append(landmark_list[8])
-                    else:
-                        point_history.append([0, 0])
+                if pose_class_name == "Fist":
+                    # Set start position of fist
+                    if self.start_pos_x == 0 and self.stop_frame >= 8:
+                        self.start_pos_x = center[0]
 
-                    finger_gesture_id = 0
-                    point_history_len = len(pre_processed_point_history_list)
-                    if point_history_len == (history_length * 2):
-                        finger_gesture_id = np.argmax(
-                            np.squeeze(
-                                gesture_model.predict(
-                                    np.array(
-                                        [pre_processed_point_history_list], dtype=np.float32
-                                    )
+                    if self.start_pos_x != 0:
+                        # If fist moved to the right get image before
+                        if (center[0] - self.start_pos_x) >= 200:
+                            self.index = (
+                                self.index + self.length - 1) % self.length
+                            self.set_image(self.index)
+                            self.start_pos_x = 0
+                            self.stop_frame = 0
+                        # If fist moved to the left get image after
+                        elif (center[0] - self.start_pos_x) <= -200:
+                            self.index = (self.index + 1) % self.length
+                            self.set_image(self.index)
+                            self.start_pos_x = 0
+                            self.stop_frame = 0
+                else:
+                    self.start_pos_x = 0
+
+                # GESTURE RECOGNITION
+                pre_processed_point_history_list = utils.pre_process_point_history(
+                    img, point_history
+                )
+
+                if pose_class_name == "Point":
+                    point_history.append(landmark_list[8])
+                else:
+                    point_history.append([0, 0])
+
+                finger_gesture_id = 0
+                point_history_len = len(pre_processed_point_history_list)
+                if point_history_len == (history_length * 2):
+                    finger_gesture_id = np.argmax(
+                        np.squeeze(
+                            gesture_model.predict(
+                                np.array(
+                                    [pre_processed_point_history_list], dtype=np.float32
                                 )
                             )
                         )
+                    )
 
-                    finger_gesture_history.append(finger_gesture_id)
-                    most_common_fg_id = Counter(
-                        finger_gesture_history).most_common()
-                    gesture_class_name = gesture_class_names[most_common_fg_id[0][0]]
-                    if gesture_class_name == "Pinch":
-                        # # Check if it is on a detail
-                        for child in self.children:
-                            if isinstance(child, DetailRectangle):
-                                # self.index = (self.index + 1) % self.length
-                                # self.set_image(self.index)
-                                if self.user_hand.collide_widget(child):
-                                    app = App.get_running_app()
-                                    app.root.current = "second"
-                                    app.root.transition.direction = "left"
-                                    # Set image and text of second window
-                                    app.root.second_window.source = "images/" + child.source
-                                    app.root.second_window.text = child.text
-                                    # Clear all queues
-                                    point_history.clear()
-                                    finger_gesture_history.clear()
+                finger_gesture_history.append(finger_gesture_id)
+                most_common_fg_id = Counter(
+                    finger_gesture_history).most_common()
+                gesture_class_name = gesture_class_names[most_common_fg_id[0][0]]
+                if gesture_class_name == "Pinch":
+                    # Check if it is on a detail
+                    for child in self.children:
+                        if isinstance(child, DetailRectangle):
+                            if self.user_hand.collide_widget(child):
+                                app = App.get_running_app()
+                                app.root.current = "second"
+                                app.root.transition.direction = "left"
+                                # Set image and text of second window
+                                app.root.second_window.source = "images/" + child.source
+                                app.root.second_window.text = child.text
+                                # Clear all queues
+                                point_history.clear()
+                                finger_gesture_history.clear()
 
     def set_image(self, index):
         with open('config/image_configs.json') as f:
@@ -158,6 +183,8 @@ class MainWindow(Screen):
             # Add image always in background
             self.add_widget(ImageWidget(
                 size=self.size, source="images/" + data['source']), 99)
+            point_history.clear()
+            finger_gesture_history.clear()
 
 
 class SecondWindow(Screen):
