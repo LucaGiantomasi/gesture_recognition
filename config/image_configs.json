@@ -1,40 +1,59 @@
 [
   {
-    "source": "wallpaper.jpg",
+    "source": "parete_est.jpg",
     "details": [
       {
-        "source": "wallpaper.jpg",
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a dui odio. Curabitur ac eros et augue blandit iaculis vel ut ante. Aliquam non elementum purus, eu pretium nunc. Phasellus eros leo, pretium eu pharetra id, porta eget orci. Morbi non congue tellus, ac viverra lacus.",
-        "start_position": [0.2, 0.15],
-        "dimension": [0.2, 0.5]
+        "source": "",
+        "text": "",
+        "start_position": [0.028, 0.35],
+        "dimension": [0.15, 0.25]
       },
       {
-        "source": "wallpaper2.jpg",
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a dui odio. Curabitur ac eros et augue blandit iaculis vel ut ante. Aliquam non elementum purus, eu pretium nunc. Phasellus eros leo, pretium eu pharetra id, porta eget orci. Morbi non congue tellus, ac viverra lacus.",
-        "start_position": [0.75, 0.15],
-        "dimension": [0.2, 0.5]
+        "source": "dettaglio_parete_est_medici.jpg",
+        "text": "I ritratti della famiglia Medici sono posti in primo piano nella parete a destra dell'altare, personificati nelle figure a cavallo: un giovane, forse un ritratto idealizzato di Lorenzo il Magnifico in pompa magna, precede il corteo su un cavallo bianco, lo seguono suo padre Piero il Gottoso ed il nonno e capofamiglia Cosimo de' Medici, entrambi a cavallo di una mula.",
+        "start_position": [0.2, 0],
+        "dimension": [0.6, 0.45]
+      },
+      {
+        "source": "",
+        "text": "",
+        "start_position": [0.53, 0.88],
+        "dimension": [0.17, 0.12]
       }
     ]
   },
   {
-    "source": "wallpaper2.jpg",
+    "source": "parete_sud.jpg",
     "details": [
       {
-        "source": "wallpaper.jpg",
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a dui odio. Curabitur ac eros et augue blandit iaculis vel ut ante. Aliquam non elementum purus, eu pretium nunc. Phasellus eros leo, pretium eu pharetra id, porta eget orci. Morbi non congue tellus, ac viverra lacus.",
-        "start_position": [0.3, 0.35],
-        "dimension": [0.2, 0.5]
+        "source": "",
+        "text": "",
+        "start_position": [0.155, 0.03],
+        "dimension": [0.105, 0.42]
       },
       {
-        "source": "wallpaper2.jpg",
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a dui odio. Curabitur ac eros et augue blandit iaculis vel ut ante. Aliquam non elementum purus, eu pretium nunc. Phasellus eros leo, pretium eu pharetra id, porta eget orci. Morbi non congue tellus, ac viverra lacus.",
-        "start_position": [0.55, 0.15],
-        "dimension": [0.1, 0.3]
+        "source": "",
+        "text": "",
+        "start_position": [0.43, 0.065],
+        "dimension": [0.413, 0.45]
       }
     ]
   },
   {
-    "source": "wallpaper3.jpg",
-    "details": []
+    "source": "parete_ovest.jpg",
+    "details": [
+      {
+        "source": "",
+        "text": "",
+        "start_position": [0.155, 0],
+        "dimension": [0.18, 0.45]
+      },
+      {
+        "source": "",
+        "text": "",
+        "start_position": [0.47, 0],
+        "dimension": [0.27, 0.55]
+      }
+    ]
   }
 ]
